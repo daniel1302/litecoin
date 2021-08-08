@@ -184,3 +184,273 @@ pg-data-claim         Bound    pvc-315d347a-be11-49d8-87f2-690ed76b70e2   500Mi 
 NAME                 PROVISIONER                RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
 standard (default)   k8s.io/minikube-hostpath   Delete          Immediate           false                  223d
 ```
+
+```
+git:(master) ✗ kubectl describe pod  litecoin-0 
+Name:         litecoin-0
+Namespace:    default
+Priority:     0
+Node:         minikube/192.168.65.2
+Start Time:   Sun, 08 Aug 2021 18:02:04 +0200
+Labels:       app=litecoin
+              controller-revision-hash=litecoin-6dfd95f446
+              statefulset.kubernetes.io/pod-name=litecoin-0
+Annotations:  <none>
+Status:       Running
+IP:           172.17.0.2
+IPs:
+  IP:           172.17.0.2
+Controlled By:  StatefulSet/litecoin
+Containers:
+  litecoin:
+    Container ID:   docker://7cac956b8132881457876fa4773e9b5e122d3cea8cf75fe1c73d5727012fb09a
+    Image:          daniel1302/litecoin:latest
+    Image ID:       docker-pullable://daniel1302/litecoin@sha256:599234e210342cc2655a593f109cbc4e9d1a8242267e6c87374c2c38cdbb00b6
+    Ports:          9332/TCP, 9333/TCP
+    Host Ports:     0/TCP, 0/TCP
+    State:          Running
+      Started:      Sun, 08 Aug 2021 18:02:08 +0200
+    Ready:          True
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  1Gi
+    Requests:
+      cpu:        1
+      memory:     1Gi
+    Environment:  <none>
+    Mounts:
+      /home/litecoin/.litecoind from litecoin (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-5tncv (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  litecoin:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  litecoin-litecoin-0
+    ReadOnly:   false
+  default-token-5tncv:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-5tncv
+    Optional:    false
+QoS Class:       Guaranteed
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  70s   default-scheduler  Successfully assigned default/litecoin-0 to minikube
+  Normal  Pulling    69s   kubelet, minikube  Pulling image "daniel1302/litecoin:latest"
+  Normal  Pulled     66s   kubelet, minikube  Successfully pulled image "daniel1302/litecoin:latest"
+  Normal  Created    66s   kubelet, minikube  Created container litecoin
+  Normal  Started    66s   kubelet, minikube  Started container litecoin
+```
+
+
+## 3. CI
+
+### Prerequisites
+
+- Particular Jenkins credentials added in the Jenkins CI
+- Added webhook in the repository which sends information about repository changes
+- Installed `GIT` plugin in Jenkins
+- Installed `Pipeline Utility Steps` plugin in Jenkins
+
+
+### Inline Scan Script
+
+I took it from the anchore github: https://github.com/anchore/ci-tools/blob/master/scripts/inline_scan
+
+### Example output
+
+```
+Started by user Daniel Hornik
+Replayed #40
+ERROR: Could not determine exact tip revision of master; falling back to nondeterministic checkout
+Running in Durability level: MAX_SURVIVABILITY
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/lib/jenkins/workspace/daniel-test_master
+[Pipeline] {
+[Pipeline] properties
+[Pipeline] stage
+[Pipeline] { (Prepare CI)
+[Pipeline] git
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --is-inside-work-tree # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url http://github.com/daniel1302/litecoin.git # timeout=10
+Fetching upstream changes from http://github.com/daniel1302/litecoin.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.23.3'
+ > git fetch --tags --force --progress -- http://github.com/daniel1302/litecoin.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+Checking out Revision 3d175dc4a68edeb5261a3af01cdac5579d382bd4 (refs/remotes/origin/master)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 3d175dc4a68edeb5261a3af01cdac5579d382bd4 # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git branch -D master # timeout=10
+ > git checkout -b master 3d175dc4a68edeb5261a3af01cdac5579d382bd4 # timeout=10
+Commit message: " #3: Add pipeline script"
+[Pipeline] readYaml
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build docker image)
+[Pipeline] timeout
+Timeout set to expire in 3 min 0 sec
+[Pipeline] {
+[Pipeline] ansiColor
+[Pipeline] {
+
+[Pipeline] sh
++ docker build -t daniel1302/litecoin:build-44 .
+Sending build context to Docker daemon  596.3MB
+
+[WARNING]: Empty continuation line found in:
+    RUN useradd -u 6655 litecoin                                                                && mkdir -p /home/litecoin/.litecoind                                                   && chown -R litecoin:litecoin /home/litecoin/.litecoind                                 && apt-get update -y                                                                    && apt-get upgrade -y                                                                   && rm -rf /var/lib/apt/lists/*
+[WARNING]: Empty continuation lines will become errors in a future release.
+Step 1/16 : ARG VERSION=0.18.1
+Step 2/16 : FROM debian:bullseye-slim as downloader
+ ---> 99a8ac0037bb
+Step 3/16 : ARG ARCH=x86_64
+ ---> Using cache
+ ---> ae37508c6e72
+Step 4/16 : ARG PRIVATE_RSA_SIGNATURE="59CAF0E96F23F53747945FD4FE3348877809386C"
+ ---> Using cache
+ ---> a421f6609213
+Step 5/16 : ARG VERSION
+ ---> Using cache
+ ---> ab2067fefc80
+Step 6/16 : WORKDIR /ltmp
+ ---> Using cache
+ ---> 0d3c975925ba
+Step 7/16 : RUN     apt-get update -y && apt-get install -y                                                     wget gnupg                                                                          && rm -rf /var/lib/apt/lists/*                                                          ;                                                                                                                                                                               FILE_NAME="litecoin-${VERSION}-${ARCH}-linux-gnu.tar.gz";                                                                                                                       gpg --keyserver keyserver.ubuntu.com --recv-keys "0x${PRIVATE_RSA_SIGNATURE}"                                                                                                   && wget -O "${FILE_NAME}.asc"         "https://download.litecoin.org/litecoin-${VERSION}/linux/${FILE_NAME}.asc"                                                                                                  && wget -O "${FILE_NAME}"                                                                   "https://download.litecoin.org/litecoin-${VERSION}/linux/${FILE_NAME}"              && gpg --verify "${FILE_NAME}.asc" "${FILE_NAME}"                                       && tar -xzvf ${FILE_NAME}
+ ---> Using cache
+ ---> 5be24b9ded3d
+Step 8/16 : FROM debian:bullseye-slim
+ ---> 99a8ac0037bb
+Step 9/16 : ARG VERSION
+ ---> Using cache
+ ---> 362a21f121f6
+Step 10/16 : EXPOSE 9332 9333
+ ---> Using cache
+ ---> 92ac89b02375
+Step 11/16 : COPY --from=downloader /ltmp/litecoin-${VERSION}/bin/ /usr/local/bin
+ ---> Using cache
+ ---> ff7f9f82e1fc
+Step 12/16 : COPY ./docker-entrypoint.sh /docker-entrypoint.sh
+ ---> Using cache
+ ---> 9222fb6c23a8
+Step 13/16 : RUN useradd -u 6655 litecoin                                                                && mkdir -p /home/litecoin/.litecoind                                                   && chown -R litecoin:litecoin /home/litecoin/.litecoind                                 && apt-get update -y                                                                    && apt-get upgrade -y                                                                   && rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> bae0a9524b49
+Step 14/16 : USER litecoin:litecoin
+ ---> Using cache
+ ---> df154f319921
+Step 15/16 : ENTRYPOINT [ "/docker-entrypoint.sh" ]
+ ---> Using cache
+ ---> 1f254152bec1
+Step 16/16 : CMD [ "litecoind" ]
+ ---> Using cache
+ ---> 644f505c893a
+Successfully built 644f505c893a
+Successfully tagged daniel1302/litecoin:build-44
+[Pipeline] }
+
+[Pipeline] // ansiColor
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Inspect docker vulns)
+[Pipeline] timeout
+Timeout set to expire in 10 min
+[Pipeline] {
+[Pipeline] ansiColor
+[Pipeline] {
+
+[Pipeline] sh
++ ./inline_scan scan daniel1302/litecoin:build-44
+
+Pulling docker.io/anchore/inline-scan:v0.10.0
+v0.10.0: Pulling from anchore/inline-scan
+Digest: sha256:e5fdd64edee8244684ab1cb95e4f102bc471632b2032c4a6f901d2e2d3a75e6c
+Status: Image is up to date for anchore/inline-scan:v0.10.0
+docker.io/anchore/inline-scan:v0.10.0
+Starting Anchore Engine
+Starting Postgresql... Postgresql started successfully!
+Starting Docker registry... Docker registry started successfully!
+Waiting for Anchore Engine to be available.
+
+	Status: not_ready....
+
+Anchore Engine is available!
+
+
+Preparing daniel1302/litecoin:build-44 for analysis
+
+Getting image source signatures
+Copying blob sha256:fcfb660ee9a8ba02f768e37a8df9804851653d3650fb8ef803a4717db048a54e
+Copying blob sha256:9603296a0529b14c4fa041191e54599f1041140bfbbf861fe1af582e1ee602b1
+Copying blob sha256:8e5c31962ed6fb9881c1239a8ded039d185ed815e5a9005d9cb3248e080bc613
+Copying blob sha256:82469494a38e5e826c30cc1c44781868408f2d94006e9d86dce4a1b05adc03a3
+Copying config sha256:644f505c893afd30c2eb3ce7d7efa66ac71061a25858561cfce2a0ee549545d4
+Writing manifest to image destination
+Storing signatures
+
+Image archive loaded into Anchore Engine using tag -- litecoin:build-44
+Waiting for analysis to complete...
+
+	Status: not_analyzed.
+	Status: analyzing...............................
+	Status: analyzed
+
+Analysis completed!
+
+
+	Policy Evaluation - litecoin:build-44
+-----------------------------------------------------------
+
+Image Digest: sha256:bce6e590a630fe2d8d415876e4ccd79ecc8aca832e6ca1a9a7d2779d4a6f7aed
+Full Tag: localhost:5000/litecoin:build-44
+Image ID: 644f505c893afd30c2eb3ce7d7efa66ac71061a25858561cfce2a0ee549545d4
+Status: pass
+Last Eval: 2021-08-08T20:41:24Z
+Policy ID: 2c53a13c-1765-11e8-82ef-23527761d060
+Final Action: warn
+Final Action Reason: policy_evaluation
+
+Gate                   Trigger            Detail                                                                                                                                                Status        
+dockerfile             instruction        Dockerfile directive 'HEALTHCHECK' not found, matching condition 'not_exists' check                                                                   warn          
+vulnerabilities        package            MEDIUM Vulnerability found in os package type (dpkg) - libgnutls30 (CVE-2011-3389 - https://security-tracker.debian.org/tracker/CVE-2011-3389)        warn          
+
+
+Cleaning up docker container: 9104-inline-anchore-engine
+[Pipeline] }
+
+[Pipeline] // ansiColor
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Publish docke rimage)
+[Pipeline] sh
++ docker pull daniel1302/litecoin:null
+[Pipeline] error
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: Image already exists. Bump the version in the config.yml to publish the new one
+Finished: FAILURE
+```

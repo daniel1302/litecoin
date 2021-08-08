@@ -17,6 +17,8 @@ services:
       - catalog
     ports:
       - "8228:8228"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     logging:
       driver: "json-file"
       options:
