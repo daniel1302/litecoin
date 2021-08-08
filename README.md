@@ -454,3 +454,37 @@ Cleaning up docker container: 9104-inline-anchore-engine
 ERROR: Image already exists. Bump the version in the config.yml to publish the new one
 Finished: FAILURE
 ```
+
+
+## 4. Text manipulation
+
+#### Problem
+
+Let's assume We have our application behind the Nginx front proxy. We collected logs from the Nginx server, and We want to know:
+
+- List of ten the most common `remote ip` address. 
+
+The informations should come with corresponding numbers.
+
+Logs are available under address: https://raw.githubusercontent.com/elastic/examples/master/Common%20Data%20Formats/nginx_json_logs/nginx_json_logs
+
+
+#### Solutions:
+
+##### Remote IPs
+
+References:
+- https://www.baeldung.com/linux/reverse-order-of-file-lines
+- https://www.gnu.org/software/gawk/manual/html_node/Functions.html
+
+
+```bash
+
+jq -r '.remote_ip' nginx_json_logs \
+    | awk '{seen[$1] += 1 } END { for (ip in seen) print ip, seen[ip] }' \
+    | sort -g -k 2n \
+    | tac \
+    | head -n 10 \
+    | awk '{ print "IP: "$1", Visits: "$2 }'
+```
+
