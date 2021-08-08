@@ -1,0 +1,58 @@
+# Template copied from: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
+# I have just adjusted it
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: litecoin
+  labels:
+    app: litecoin
+spec:
+  ports:
+  - port: 9332
+    name: rpc
+  - port: 9333
+    name: svc
+  clusterIP: None
+  selector:
+    app: litecoin
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: litecoin
+spec:
+  selector:
+    matchLabels:
+      app: litecoin # has to match .spec.template.metadata.labels
+  serviceName: "litecoin"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: litecoin # has to match .spec.selector.matchLabels
+    spec:
+      containers:
+      - name: litecoin
+        image: daniel1302/litecoin:latest
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+        ports:
+        - containerPort: 9332
+          name: rpc
+        - containerPort: 9333
+          name: svc
+        volumeMounts:
+        - name: litecoin
+          mountPath: /home/litecoin/.litecoind
+  volumeClaimTemplates:
+  - metadata:
+      name: litecoin
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "standard" # I am assuming, the standard storage class is available.
+      resources:
+        requests:
+          storage: 1Gi

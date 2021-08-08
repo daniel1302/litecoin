@@ -155,3 +155,32 @@ util-linux                    2.36.1-8                            BSD-2-clause B
 zlib1g                        1:1.2.11.dfsg-2                     Zlib
 ```
 
+
+
+### 2. Kubernetes
+
+Template copied from: `https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/`.I have just adjusted it.
+
+#### Starting app in k8s
+
+```
+kubectl apply -f k8s.yaml
+```
+
+#### Some outputs
+
+```
+➜  littlecoin git:(master) ✗ minikube version
+minikube version: v1.16.0
+commit: 9f1e482427589ff8451c4723b6ba53bb9742fbb1
+➜  littlecoin git:(master) ✗ kubectl get statefulset
+NAME       READY   AGE
+litecoin   1/1     3m15s
+➜  littlecoin git:(master) ✗ kubectl get pvc        
+NAME                  STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+litecoin-litecoin-0   Bound    pvc-1327c67f-729e-4f10-a330-443ade3fca5e   1Gi        RWO            standard       3m19s
+pg-data-claim         Bound    pvc-315d347a-be11-49d8-87f2-690ed76b70e2   500Mi      RWO            standard       223d
+➜  littlecoin git:(master) ✗ kubectl get storageclass
+NAME                 PROVISIONER                RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+standard (default)   k8s.io/minikube-hostpath   Delete          Immediate           false                  223d
+```
