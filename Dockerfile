@@ -37,7 +37,8 @@ RUN \
 
 
 
-
+# We can consider to switch to sth smaller like alpine, or scratch, but 
+# I like debian-like operating systems
 FROM debian:bullseye-slim
 
 ARG VERSION
@@ -53,9 +54,15 @@ COPY --from=downloader /ltmp/litecoin-${VERSION}/bin/ /usr/local/bin
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
 # Change to non-root user, and create datadir
-RUN useradd -u 6655 litecoin \
-    && mkdir -p /home/litecoin/.litecoind \
-    && chown -R litecoin:litecoin /home/litecoin/.litecoind
+RUN useradd -u 6655 litecoin                                                            \
+    && mkdir -p /home/litecoin/.litecoind                                               \
+    && chown -R litecoin:litecoin /home/litecoin/.litecoind                             \
+
+    # Upgrade all packages
+    && apt-get update -y                                                                \
+    && apt-get upgrade -y                                                               \
+    && rm -rf /var/lib/apt/lists/*
+
 
 USER litecoin:litecoin
 
