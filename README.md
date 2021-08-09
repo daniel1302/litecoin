@@ -471,8 +471,6 @@ Logs are available under address: https://raw.githubusercontent.com/elastic/exam
 
 #### Solutions:
 
-##### Remote IPs
-
 References:
 - https://www.baeldung.com/linux/reverse-order-of-file-lines
 - https://www.gnu.org/software/gawk/manual/html_node/Functions.html
@@ -488,3 +486,44 @@ jq -r '.remote_ip' nginx_json_logs \
     | awk '{ print "IP: "$1", Visits: "$2 }'
 ```
 
+#### Result 
+
+```
+IP: 216.46.173.126, Visits: 2350
+IP: 180.179.174.219, Visits: 1720
+IP: 204.77.168.241, Visits: 1439
+IP: 65.39.197.164, Visits: 1365
+IP: 80.91.33.133, Visits: 1202
+IP: 84.208.15.12, Visits: 1120
+IP: 74.125.60.158, Visits: 1084
+IP: 119.252.76.162, Visits: 1064
+IP: 79.136.114.202, Visits: 628
+IP: 54.207.57.55, Visits: 532
+```
+
+## 5. Text manipulation in programming language
+
+#### Solution
+
+```bash
+
+cd task_5_solution;
+go mod vendor;
+go build -o task_5_solution cmd/main.go;
+./task_5_solution/task_5_solution ./nginx_json_logs 
+```
+
+#### Results
+
+```
+IP: 216.46.173.126, Visits: 2350
+IP: 180.179.174.219, Visits: 1720
+IP: 204.77.168.241, Visits: 1439
+IP: 65.39.197.164, Visits: 1365
+IP: 80.91.33.133, Visits: 1202
+IP: 84.208.15.12, Visits: 1120
+IP: 74.125.60.158, Visits: 1084
+IP: 119.252.76.162, Visits: 1064
+IP: 79.136.114.202, Visits: 628
+IP: 54.207.57.55, Visits: 532
+```

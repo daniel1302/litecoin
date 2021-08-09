@@ -22,7 +22,7 @@ node {
         // Ref: https://www.jenkins.io/doc/pipeline/steps/git/
         git changelog: false,
           url: repositoryUrl,
-          branch: 'master'
+          branch: 'master' // This needs to be replaced with proper branch detection. Currently for testing this CI it is master.
      
         isMaster = (env.BRANCH_NAME == 'master')
         currentFullImage += ':build-' + env.BUILD_NUMBER
@@ -49,6 +49,7 @@ node {
 
     stage("Publish docke rimage") {
       if (!isMaster) {
+        print("Skipped")
         return
       }
 
