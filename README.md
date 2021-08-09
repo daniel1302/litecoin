@@ -527,3 +527,19 @@ IP: 119.252.76.162, Visits: 1064
 IP: 79.136.114.202, Visits: 628
 IP: 54.207.57.55, Visits: 532
 ```
+
+
+# 6. Terraform module
+
+References:
+  - https://registry.terraform.io/providers/hashicorp/aws/latest/docs
+  - https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-cli.html
+
+Test:
+
+```
+cd terraform;
+terraform init;
+terraform plan;
+terraform apply;
+```
